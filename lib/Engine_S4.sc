@@ -1,28 +1,26 @@
 Engine_S4 : CroneEngine {
 
 	var params;
-
+// need an "in bus" or nil for op A i suppose?
+// inbus a, b, c, d --- a is silence?
+// outbus x, b, c, d, default  ---- x is /dev/null, default is audio out
+// use in bus as phase modulator for sin osc?
+// output to
 	alloc {
 		SynthDef("S4", {
-			arg out = 0,
-			freq, sub_div, noise_level,
-			cutoff, resonance,
-			attack, release,
-			amp, pan;
+			arg outBus = 0,
+			inBus,
+			freq, ratio, amp,
+			attack, release;
 
-			var pulse = Pulse.ar(freq: freq);
-			var saw = Saw.ar(freq: freq);
-			var sub = Pulse.ar(freq: freq/sub_div);
-			var noise = WhiteNoise.ar(mul: noise_level);
-			var mix = Mix.ar([pulse,saw,sub,noise]);
+			var env = EnvGen.kr(
+				Env.perc(attack,release),
+				doneAction:2
+			);
 
-			var envelope = Env.perc(attackTime: attack, releaseTime: release, level: amp).kr(doneAction: 2);
-			var filter = MoogFF.ar(in: mix, freq: cutoff * envelope, gain: resonance);
-
-			var signal = Pan2.ar(filter*envelope,pan);
-
-			Out.ar(out,signal);
-
+			var mod = In.ar(inBus,1);
+			var car = SinOsc.ar( freq * ratio + mod ) * env * amp;
+			Out.ar(outBus,car);
 		}).add;
 
   // We don't need to sync with the server in this example,
@@ -33,14 +31,12 @@ Engine_S4 : CroneEngine {
   // let's create an Dictionary (an unordered associative collection)
   //   to store parameter values, initialized to defaults.
 		params = Dictionary.newFrom([
-			\sub_div, 2,
-			\noise_level, 0.1,
-			\cutoff, 8000,
-			\resonance, 3,
-			\attack, 0,
+			\outBus, 0,
+			\inBus, 0,
+			\ratio, 1,
+			\attack, 0.01,
 			\release, 0.4,
-			\amp, 0.5,
-			\pan, 0;
+			\amp, 1;
 		]);
 
   // "Commands" are how the Lua interpreter controls the engine.

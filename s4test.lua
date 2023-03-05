@@ -44,30 +44,17 @@ m.event = function(data)
   scrollback_active = (scrollback_active + 1) % 10
   scrollback[scrollback_active] = msg_to_str(d)
   if d.type == "cc" then
-
 	if d.cc == 32 then
-		engine.cutoff(util.linexp(0,127,300,12000,d.val))
-	end
-	if d.cc == 33 then
-		engine.noise_level(util.linlin(0,127,0,1,d.val))
-	end
-	if d.cc == 34 then
-		engine.resonance(util.linlin(0,127,1,6,d.val))
-	end
-	if d.cc == 35 then
-		engine.sub_div(util.linlin(0,127,0,5,d.val))
-	end
-	if d.cc == 36 then
 		engine.attack(util.linlin(0,127,0,1,d.val))
 	end
-	if d.cc == 37 then
+	if d.cc == 33 then
 		engine.release(util.linlin(0,127,0,1,d.val))
 	end
-	if d.cc == 38 then
+	if d.cc == 34 then
 		engine.amp(util.linlin(0,127,0,2,d.val))
 	end
-	if d.cc == 39 then
-		engine.pan(util.linlin(0,127,-1,1,d.val))
+	if d.cc == 35 then
+		engine.ratio(util.linlin(0,127,0,2,d.val))
 	end
   end
   redraw()
@@ -79,7 +66,7 @@ function init()
 	for i = 0,10 do
 		scrollback[i] = "line "..i
 	end
-	s4.add_params() -- the script adds params via the `.add params()` function
+	s4.add_params()
 end
 
 
