@@ -7,7 +7,7 @@ engine.name = 'S4' -- assign the engine to this script's run
 s4 = include('s4/lib/s4_engine')
 
 m = midi.connect() -- if no argument is provided, we default to port 1
-
+seq = midi.connect(2) -- sequencer
 function midi_to_hz(note)
   local hz = (440 / 32) * (2 ^ ((note - 9) / 12))
   return hz
@@ -32,15 +32,17 @@ function msg_to_str(msg)
 	return s
 end
 
+seq.event = function(data)
+	local d = midi.to_msg(data)
+	if d.type == "note_on" then
+		s4.trig(midi_to_hz(d.note))
+	end
+end
+
 m.event = function(data)
   local d = midi.to_msg(data)
   scrollback_active = (scrollback_active + 1) % 10
   scrollback[scrollback_active] = msg_to_str(d)
-  if d.type == "note_on" then
-    --engine.amp(d.vel / 127)
-  --  engine.hz(midi_to_hz(d.note))
-    s4.trig(midi_to_hz(d.note))
-  end
   if d.type == "cc" then
 
 	if d.cc == 32 then
