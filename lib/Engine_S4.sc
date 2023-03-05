@@ -10,12 +10,18 @@ Engine_S4 : CroneEngine {
 			attack, release,
 			amp, pan;
 
-			var s1 = SinOsc.ar(freq: freq);
-			var s2 = SinOsc.ar(freq: freq, phase: amp*2pi);
+			var pulse = Pulse.ar(freq: freq);
+			var saw = Saw.ar(freq: freq);
+			var sub = Pulse.ar(freq: freq/sub_div);
+			var noise = WhiteNoise.ar(mul: noise_level);
+			var mix = Mix.ar([pulse,saw,sub,noise]);
 
-			var envelope = EnvGen.kr(envelope:Env.perc(attackTime: attack, releaseTime: release), doneAction: 2);
+			var envelope = Env.perc(attackTime: attack, releaseTime: release, level: amp).kr(doneAction: 2);
+			var filter = MoogFF.ar(in: mix, freq: cutoff * envelope, gain: resonance);
 
-			Out.ar(out,[s1*envelope*multl,s2*envelope*multr]);
+			var signal = Pan2.ar(filter*envelope,pan);
+
+			Out.ar(out,signal);
 
 		}).add;
 
@@ -34,7 +40,7 @@ Engine_S4 : CroneEngine {
 			\attack, 0,
 			\release, 0.4,
 			\amp, 0.5,
-			\pan, 0.5;
+			\pan, 0;
 		]);
 
   // "Commands" are how the Lua interpreter controls the engine.

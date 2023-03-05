@@ -1,7 +1,7 @@
 --
 -- MIDI keyboard
 -- into custom sc
--- scrollback 10
+--
 
 engine.name = 'S4' -- assign the engine to this script's run
 s4 = include('s4/lib/s4_engine')
@@ -62,14 +62,10 @@ m.event = function(data)
 		engine.release(util.linlin(0,127,0,1,d.val))
 	end
 	if d.cc == 38 then
-		local tmp = util.linlin(0,127,0,1,d.val)
-		scrollback[scrollback_active] = "pha > " .. tmp
-		engine.amp(tmp)
+		engine.amp(util.linlin(0,127,0,2,d.val))
 	end
 	if d.cc == 39 then
-		local tmp = util.linlin(0,127,0,1,d.val)
-		scrollback[scrollback_active] = "pan > " .. tmp
-		engine.pan(tmp)
+		engine.pan(util.linlin(0,127,-1,1,d.val))
 	end
   end
   redraw()

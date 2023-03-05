@@ -3,14 +3,14 @@ local Formatters = require 'formatters'
 
 -- first, we'll collect all of our commands into norns-friendly ranges
 local specs = {
-  ["amp"] = controlspec.new(0, 1, "lin", 0, 0.5, ""),
+  ["amp"] = controlspec.new(0, 2, "lin", 0, 1, ""),
   ["sub_div"] = controlspec.new(1, 10, "lin", 1, 2, ""),
   ["noise_level"] = controlspec.new(0, 1, "lin", 0, 0.3, ""),
   ["cutoff"] = controlspec.new(0.1, 20000, 'exp', 0, 1300, "Hz"),
   ["resonance"] = controlspec.new(0, 4, "lin", 0, 2, ""),
   ["attack"] = controlspec.new(0.003, 8, "exp", 0, 0, "s"),
   ["release"] = controlspec.new(0.003, 8, "exp", 0, 1, "s"),
-  ["pan"] = controlspec.PAN,
+  ["pan"] = controlspec.PAN
 }
 
 -- this table establishes an order for parameter initialization:
