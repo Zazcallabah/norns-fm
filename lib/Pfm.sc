@@ -39,8 +39,12 @@ Pfm {
 					ratio = 1,
 					detune = 1,
 					stopGate = 1,
-					attack=0.1, decay=0.1, sustain=1, release=2, curve=-4,
-					amp=1;
+					attack = 0.1,
+					decay = 0.1,
+					sustain = 1,
+					release = 2,
+					curve = -4,
+					amp = 1;
 
 					var envelope = EnvGen.kr(
 						envelope: Env.adsr(attackTime: attack, decayTime: decay, sustainLevel: sustain, releaseTime: release, curve: curve),

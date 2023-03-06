@@ -8,6 +8,13 @@ s = require 'sequins'
 
 lastmessage = ""
 infomessage = ""
+routing = {
+  {false,false,false,false},
+  {false,false,false,false},
+  {false,false,false,false},
+  {false,false,false,false}
+}
+
 
 m = midi.connect() -- if no argument is provided, we default to port 1
 --seq = midi.connect(2) -- sequencer
@@ -44,11 +51,19 @@ m.event = function(data)
   local d = midi.to_msg(data)
   lastmessage = msg_to_str(d)
   if d.type == "note_on" then
- 		engine.noteOn(midi_to_hz(d.note))
+    local startN = 32
+    local note = d.note - startN
+    local op = math.floor(note / 4) + 1
+    local ix = (note % 4) + 1
+
+    routing[op][ix] = not routing[op][ix]
+
+    if ix == 4 then
+      engine.toggleListen(op)
+    else
+      engine.toggleRoute(op,ix + 1)
+    end
  	end
-   if d.type == "note_off" then
-    engine.noteOff()
-  end
 
   -- ["amp"]     = controlspec.new(0, 2,     "lin", 0.01,       1, ""),
   -- ["ratio"]   = controlspec.new(0, 4,     "lin", 0.1,       1, ""),
@@ -64,7 +79,7 @@ m.event = function(data)
   local startCC = 32 -- my midi controller topleft knob cc
   if d.type == "cc" then
     local cc = d.cc - startCC
-    local op = math.floor(cc / 4)
+    local op = math.floor(cc / 4) + 1
     local ix = cc % 4
     if ix == 0 then
       local val = util.linlin(0,127,0,4,d.val)
@@ -94,33 +109,32 @@ function init()
 
   pfm.add_params()
 
-  mults = s{1, 2.25, 0.25, 1.5, 3.5, 2, 3, 0.75 }
+
+
+  mults = s{0, 7, s{0, 3, 7, 3, 3, 3} }
   playing = false
-  base_hz = 440
-  -- sequence = clock.run(
-  --   function()
-  --     while true do
-  --       clock.sync(1/4)
-  --       if playing then
-  --         for i = 1,8 do
-  --           engine.noteOn( base_hz * mults[i]() * math.random(2))
-  --         end
-  --       end
-  --     end
-  --   end
-  -- )
+  sequence = clock.run(
+    function()
+      on = false
+      while true do
+        clock.sync(1/2)
+        if playing then
+            if on then
+              engine.noteOff()
+            else
+              engine.noteOn(midi_to_hz(64 + mults()))
+            end
+            on = not on
+        end
+      end
+    end
+  )
 
-
-  engine.toggleListen(2)
-  engine.toggleRoute(1,2)
 end
 
 function key(n,z)
   if n == 3 and z == 1 then
     playing = not playing
-    for i = 1,3 do
-      mults[i]:reset() -- resets sequins index to 1
-    end
     if not playing then
         engine.free_all_notes()
       end
@@ -130,6 +144,19 @@ end
 
 function redraw()
   screen.clear()
+  for x = 1,4 do
+    for y = 1,4 do
+      if routing[y][x] then
+        screen.level(15)
+      else
+        screen.level(1)
+      end
+      screen.circle(10+(x*5), 32+(y*5), 1)
+      screen.fill()
+    end
+  end
+
+
 	screen.level(15)
   screen.move(10,10)
   screen.text(lastmessage)
