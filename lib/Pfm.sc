@@ -37,6 +37,7 @@ Pfm {
 					inBus,
 					freq,
 					ratio = 1,
+					detune = 1,
 					stopGate = 1,
 					attack=0.1, decay=0.1, sustain=1, release=2, curve=-4,
 					amp=1;
@@ -48,7 +49,7 @@ Pfm {
 					);
 
 					var mod = InFeedback.ar(inBus,1);
-					var car = SinOsc.ar( freq * ratio, mod.mod(8pi) ) * envelope;
+					var car = SinOsc.ar( freq * ratio * detune, mod.mod(8pi) ) * envelope;
 					var signal = car * amp;
 					Out.ar(outBusA, signal);
 					Out.ar(outBusB, signal);
@@ -78,6 +79,7 @@ Pfm {
 			\release, 1,
 			\curve, -4,
 			\amp, 1,
+			\detune, 1,
 			\ratio, 1;
 		]);
 
