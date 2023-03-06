@@ -33,8 +33,8 @@ Pfm {
 						doneAction: 2
 					);
 
-					var mod = In.ar(inBus,1);
-					var car = SinOsc.ar( freq + (mod * ratio) ) * envelope;
+					var mod = InFeedback.ar(inBus,1);
+					var car = SinOsc.ar( freq, (mod * ratio) ) * envelope;
 					var signal = car * amp;
 					Out.ar(outBusA, signal);
 					Out.ar(outBusB, signal);
@@ -84,7 +84,7 @@ Pfm {
 		voiceParams[voiceKey][\freq] = freq;
 		Synth.new("Pfm", [
 			\freq, freq,
-			\inBus, inputBuses[voiceKey],
+			\inBus, inputBuses[voiceKey].index,
 			\stopGate, 1,
 			\outBusA, outputBuses[voiceKey].at(0),
 			\outBusB, outputBuses[voiceKey].at(1),
