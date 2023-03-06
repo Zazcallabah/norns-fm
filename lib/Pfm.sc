@@ -15,6 +15,20 @@ Pfm {
 			var s = Server.default;
 
 			s.waitForBoot {
+
+// params:
+// amp: controls amp of output, 0-10000 for modulators, 0-1 for carriers
+// ratio: eeeeh idk, maybe we need ratio and detune? detune from 0-2, as a multiplier
+// attack
+// release
+
+// sustain? release?
+// envelope curve??
+
+// add feedback??
+
+// index of modulation = modulator amp / modulator freq
+// so instead of amp on modulator op, we could have freq * ... ratio? * "index"
 				SynthDef("Pfm", {
 					arg outBusA,
 					outBusB,
@@ -24,17 +38,17 @@ Pfm {
 					freq,
 					ratio = 1,
 					stopGate = 1,
-					attack=0.1, decay= 1, sustain=1, release=2,
+					attack=0.1, decay=0.1, sustain=1, release=2, curve=-4,
 					amp=1;
 
 					var envelope = EnvGen.kr(
-						envelope: Env.adsr(attackTime: attack, decayTime: decay, sustainLevel: sustain, releaseTime: release),
+						envelope: Env.adsr(attackTime: attack, decayTime: decay, sustainLevel: sustain, releaseTime: release, curve: curve),
 						gate: stopGate,
 						doneAction: 2
 					);
 
 					var mod = InFeedback.ar(inBus,1);
-					var car = SinOsc.ar( freq, (mod * ratio) ) * envelope;
+					var car = SinOsc.ar( freq * ratio, mod.mod(8pi) ) * envelope;
 					var signal = car * amp;
 					Out.ar(outBusA, signal);
 					Out.ar(outBusB, signal);
@@ -58,10 +72,11 @@ Pfm {
 
 		globalParams = Dictionary.newFrom([
 			\freq, 400,
-			\attack, 0,
-			\decay, 0.5,
+			\attack, 1,
+			\decay, 1,
 			\sustain, 1,
-			\release, 0.4,
+			\release, 1,
+			\curve, -4,
 			\amp, 1,
 			\ratio, 1;
 		]);
