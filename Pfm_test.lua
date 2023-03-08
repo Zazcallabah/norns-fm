@@ -99,22 +99,22 @@ m.event = function(data)
     if ix == 0 then
       local val = util.linlin(0,127,0,4,d.val)
       params:set("Pfm_"..op.."ratio", val )
-      infomessage = "op" .. op .. " ratio: " .. (engine.getParam(op,"ratio"))
+      infomessage = "op" .. op .. " ratio: " .. (params:get("Pfm_"..op.."ratio") or "x")
     end
     if ix == 1 then
       local val = util.linlin(0,127,0.8,1.2,d.val)
       params:set("Pfm_"..op.."detune", val)
-      infomessage = "op" .. op .. " detune: " .. (engine.getParam(op,"detune"))
+      infomessage = "op" .. op .. " detune: " .. (params:get("Pfm_"..op.."detune") or "x")
     end
     if ix == 2 then
       local val = util.linlin(0,127,0,10,d.val)
       params:set("Pfm_"..op.."amp", val)
-      infomessage = "op" .. op .. " amp: " .. (engine.getParam(op,"amp"))
+      infomessage = "op" .. op .. " amp: " .. (params:get("Pfm_"..op.."amp") or "x")
     end
     if ix == 3 then
       local val =  util.linlin(0,127,0,8,d.val)
       params:set("Pfm_"..op.."release",val)
-      infomessage = "op" .. op .. " rel: " .. (engine.getParam(op,"release"))
+      infomessage = "op" .. op .. " rel: " .. (params:get("Pfm_"..op.."release") or "x")
     end
   end
   redraw()

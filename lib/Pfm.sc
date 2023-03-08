@@ -127,10 +127,6 @@ Pfm {
 		});
 	}
 
-	getParam { arg voiceKey, paramKey;
-		voiceParams[voiceKey][paramKey]
-	}
-
 	noteOn {
 		arg freq;
 		voiceKeys.do({ arg vK;

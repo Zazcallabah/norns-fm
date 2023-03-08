@@ -26,9 +26,6 @@ Engine_Pfm : CroneEngine {
 				kernel.setParam(msg[1].asSymbol,paramKey.asSymbol,msg[2].asFloat);
 			});
 		});
-		this.addCommand(\getParam, "ss", { arg msg;
-			kernel.getParam(msg[1].asSymbol,msg[2].asSymbol)
-		});
 		this.addCommand(\free_all_notes, "", {
 			kernel.freeAllNotes();
 		});

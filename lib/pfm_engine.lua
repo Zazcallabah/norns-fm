@@ -36,9 +36,6 @@ function Pfm.add_params()
   params:bang()
 end
 
-function Pfm.getParam(op,p)
-  engine.getParam(op,p)
-end
 function Pfm.toggleRoute(op,out)
   engine.toggleRoute(op,out)
 end
