@@ -17,13 +17,18 @@ routing = {
 
 
 m = midi.connect() -- if no argument is provided, we default to port 1
---seq = midi.connect(2) -- sequencer
--- seq.event = function(data)
--- 	local d = midi.to_msg(data)
--- 	if d.type == "note_on" then
--- 		s4.trig(midi_to_hz(d.note))
--- 	end
--- end
+m2 = midi.connect(2) -- sequencer
+m2.event = function(data)
+	local d = midi.to_msg(data)
+  lastmessage = msg_to_str(d)
+  if d.type=="note_off" then
+    engine.noteOff()
+  end
+  if d.type=="note_on" then
+    engine.noteOn(midi_to_hz(d.note))
+  end
+  redraw()
+end
 function midi_to_hz(note)
   local hz = (440 / 32) * (2 ^ ((note - 9) / 12))
   return hz
@@ -60,10 +65,20 @@ m.event = function(data)
 
     if ix == 4 then
       engine.toggleListen(op)
+              if routing[op][ix]  then
+                infomessage = "sending op " .. op .. " to out"
+              else
+                infomessage = "muting op " .. op
+              end
     else
       engine.toggleRoute(op,ix + 1)
+            if routing[op][ix]  then
+              infomessage =  "sending op ".. op .. " to " .. (ix+1)
+            else
+              infomessage = "not sending op ".. op .. " to " .. (ix+1)
+            end
     end
- 	end
+  end
 
   -- ["amp"]     = controlspec.new(0, 2,     "lin", 0.01,       1, ""),
   -- ["ratio"]   = controlspec.new(0, 4,     "lin", 0.1,       1, ""),
@@ -83,23 +98,23 @@ m.event = function(data)
     local ix = cc % 4
     if ix == 0 then
       local val = util.linlin(0,127,0,4,d.val)
-      infomessage = "op" .. op .. " ratio: " .. val
       params:set("Pfm_"..op.."ratio", val )
+      infomessage = "op" .. op .. " ratio: " .. (engine.getParam(op,"ratio"))
     end
     if ix == 1 then
       local val = util.linlin(0,127,0.8,1.2,d.val)
-      infomessage = "op" .. op .. " detune: " .. val
       params:set("Pfm_"..op.."detune", val)
+      infomessage = "op" .. op .. " detune: " .. (engine.getParam(op,"detune"))
     end
     if ix == 2 then
-      local val = util.linlin(0,127,0,2,d.val)
-      infomessage = "op" .. op .. " amp: " .. val
+      local val = util.linlin(0,127,0,10,d.val)
       params:set("Pfm_"..op.."amp", val)
+      infomessage = "op" .. op .. " amp: " .. (engine.getParam(op,"amp"))
     end
     if ix == 3 then
       local val =  util.linlin(0,127,0,8,d.val)
-      infomessage = "op" .. op .. " rel: " .. val
       params:set("Pfm_"..op.."release",val)
+      infomessage = "op" .. op .. " rel: " .. (engine.getParam(op,"release"))
     end
   end
   redraw()
@@ -108,10 +123,7 @@ end
 function init()
 
   pfm.add_params()
-
-
-
-  mults = s{0, 7, s{0, 3, 7, 3, 3, 3} }
+  mults = s{ 0, 7, 2, 7, 0, 7, 2, 7, -2, 4, 1, 4, -2, 4, 1, 4 }
   playing = false
   sequence = clock.run(
     function()

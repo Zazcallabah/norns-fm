@@ -15,20 +15,6 @@ Pfm {
 			var s = Server.default;
 
 			s.waitForBoot {
-
-// params:
-// amp: controls amp of output, 0-10000 for modulators, 0-1 for carriers
-// ratio: eeeeh idk, maybe we need ratio and detune? detune from 0-2, as a multiplier
-// attack
-// release
-
-// sustain? release?
-// envelope curve??
-
-// add feedback??
-
-// index of modulation = modulator amp / modulator freq
-// so instead of amp on modulator op, we could have freq * ... ratio? * "index"
 				SynthDef("Pfm", {
 					arg outBusA,
 					outBusB,
@@ -44,7 +30,7 @@ Pfm {
 					sustain = 1,
 					release = 2,
 					curve = -4,
-					amp = 1;
+					amp = 0.2;
 
 					var envelope = EnvGen.kr(
 						envelope: Env.adsr(attackTime: attack, decayTime: decay, sustainLevel: sustain, releaseTime: release, curve: curve),
@@ -95,7 +81,7 @@ Pfm {
 		voiceKeys.do({ arg voiceKey;
 			singleVoices[voiceKey] = Group.new(voiceGroup);
 			voiceParams[voiceKey] = Dictionary.newFrom(globalParams);
-			outputBuses[voiceKey] = List[nullBus.index,nullBus.index,nullBus.index,nullBus.index,nullBus.index];
+			outputBuses[voiceKey] = List[nullBus.index, nullBus.index, nullBus.index, nullBus.index, nullBus.index, nullBus.index];
 			inputBuses[voiceKey] = Bus.audio(s,1);
 		});
 	}
@@ -108,9 +94,9 @@ Pfm {
 			\inBus, inputBuses[voiceKey].index,
 			\stopGate, 1,
 			\outBusA, outputBuses[voiceKey].at(0),
-			\outBusB, outputBuses[voiceKey].at(1),
-			\outBusC, outputBuses[voiceKey].at(2),
-			\outBusD, outputBuses[voiceKey].at(3)
+			\outBusB, outputBuses[voiceKey].at(2),
+			\outBusC, outputBuses[voiceKey].at(3),
+			\outBusD, outputBuses[voiceKey].at(4)
 		] ++ voiceParams[voiceKey].getPairs, singleVoices[voiceKey]);
 	}
 
@@ -139,6 +125,10 @@ Pfm {
 		{
 			this.adjustVoice(voiceKey, paramKey, paramValue);
 		});
+	}
+
+	getParam { arg voiceKey, paramKey;
+		voiceParams[voiceKey][paramKey]
 	}
 
 	noteOn {

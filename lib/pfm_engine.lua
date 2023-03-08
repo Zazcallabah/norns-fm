@@ -2,7 +2,7 @@ local Pfm = {}
 
 local specs = {
 -- controlspec.new(min, max, warp, step, default, units, quantum, wrap)
-  ["amp"]     = controlspec.new(0, 2,     "lin", 0.01,       1, ""),
+  ["amp"]     = controlspec.new(0.01, 10,     "exp", 0.01,      0.2, ""),
   ["ratio"]   = controlspec.new(0, 4,     "lin", 0.1,       1, ""),
   ["detune"]  = controlspec.new(0.8, 1.2, "lin", 0.001,   1, ""),
   ["attack"]  = controlspec.new(0.01, 8,  "exp", 0.01,    0.1, "s"),
@@ -36,6 +36,9 @@ function Pfm.add_params()
   params:bang()
 end
 
+function Pfm.getParam(op,p)
+  engine.getParam(op,p)
+end
 function Pfm.toggleRoute(op,out)
   engine.toggleRoute(op,out)
 end
