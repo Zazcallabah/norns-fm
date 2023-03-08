@@ -14,7 +14,16 @@ routing = {
   {false,false,false,false},
   {false,false,false,false}
 }
-
+parameter_table = {
+  [0]={p="ratio_t",min=0,max=100},
+  [1]={p="ratio_n",min=1,max=100},
+  [2]={p="detune",min=0.8,max=1.2},
+  [3]={p="amp",min=0,max=10},
+  [4]={p="attack",min=0,max=5},
+  [5]={p="decay",min=0,max=5},
+  [6]={p="sustain",min=0,max=1},
+  [7]={p="release",min=0,max=5}
+}
 
 m = midi.connect() -- if no argument is provided, we default to port 1
 m2 = midi.connect(2) -- sequencer
@@ -52,6 +61,12 @@ function msg_to_str(msg)
 	return s
 end
 
+function set_param(p,op,min,max,val)
+  local v = util.linlin(0,127,min,max,val)
+  params:set("Pfm_" .. op .. p, v)
+  infomessage = "op" .. op .. " ".. p ..": " .. params:get("Pfm_" .. op .. p)
+end
+
 m.event = function(data)
   local d = midi.to_msg(data)
   lastmessage = msg_to_str(d)
@@ -65,6 +80,9 @@ m.event = function(data)
 
     if ix == 4 then
       engine.toggleListen(op)
+      -- carrier amplitude is locked to 0.4 for safety reasons
+      params:set("Pfm_" .. op .. "amp", 0.4)
+
               if routing[op][ix]  then
                 infomessage = "sending op " .. op .. " to out"
               else
@@ -80,41 +98,18 @@ m.event = function(data)
     end
   end
 
-  -- ["amp"]     = controlspec.new(0, 2,     "lin", 0.01,       1, ""),
-  -- ["ratio"]   = controlspec.new(0, 4,     "lin", 0.1,       1, ""),
-  -- ["detune"]  = controlspec.new(0.8, 1.2, "lin", 0.001,   1, ""),
-  -- ["attack"]  = controlspec.new(0.01, 8,  "exp", 0.01,    1, "s"),
-  -- ["release"] = controlspec.new(0.01, 8,  "exp", 0.01,    1, "s"),
-  -- ["sustain"] = controlspec.new(0.01, 1,  "lin", 0.01,    1, ""),
-  -- ["decay"]   = controlspec.new(0.01, 1,  "lin", 0.01,    0.01, "s"),
-  -- ["curve"]   = controlspec.new(-5, 5,    "lin", 0.1,     -4, ""),
-
-
-
-  local startCC = 32 -- my midi controller topleft knob cc
   if d.type == "cc" then
-    local cc = d.cc - startCC
-    local op = math.floor(cc / 4) + 1
+    -- cc 32-47 4x ratio detune amp one row for each op
+    -- cc 48-63 4x adsr same
+    local cc = d.cc - 32
     local ix = cc % 4
-    if ix == 0 then
-      local val = util.linlin(0,127,0,4,d.val)
-      params:set("Pfm_"..op.."ratio", val )
-      infomessage = "op" .. op .. " ratio: " .. (params:get("Pfm_"..op.."ratio") or "x")
-    end
-    if ix == 1 then
-      local val = util.linlin(0,127,0.8,1.2,d.val)
-      params:set("Pfm_"..op.."detune", val)
-      infomessage = "op" .. op .. " detune: " .. (params:get("Pfm_"..op.."detune") or "x")
-    end
-    if ix == 2 then
-      local val = util.linlin(0,127,0,10,d.val)
-      params:set("Pfm_"..op.."amp", val)
-      infomessage = "op" .. op .. " amp: " .. (params:get("Pfm_"..op.."amp") or "x")
-    end
-    if ix == 3 then
-      local val =  util.linlin(0,127,0,8,d.val)
-      params:set("Pfm_"..op.."release",val)
-      infomessage = "op" .. op .. " rel: " .. (params:get("Pfm_"..op.."release") or "x")
+    local para = parameter_table[ix]
+    if cc > 15 then para = parameter_table[ix+4] end
+    local op = (math.floor( cc / 4) % 4) + 1
+    if para.p == "amp" and routing[op][4] then
+      infomessage = "amp locked for carrier"
+    else
+      set_param(para.p,op,para.min,para.max,d.val)
     end
   end
   redraw()

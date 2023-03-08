@@ -22,7 +22,8 @@ Pfm {
 					outBusD,
 					inBus,
 					freq,
-					ratio = 1,
+					ratio_t = 4,
+					ratio_n = 4,
 					detune = 1,
 					stopGate = 1,
 					attack = 0.1,
@@ -38,9 +39,12 @@ Pfm {
 						doneAction: 2
 					);
 
+					var ratio = ratio_t / ratio_n;
+
 					var mod = InFeedback.ar(inBus,1);
 					var car = SinOsc.ar( freq * ratio * detune, mod.mod(8pi) ) * envelope;
 					var signal = car * amp;
+
 					Out.ar(outBusA, signal);
 					Out.ar(outBusB, signal);
 					Out.ar(outBusC, signal);
@@ -70,7 +74,8 @@ Pfm {
 			\curve, -4,
 			\amp, 1,
 			\detune, 1,
-			\ratio, 1;
+			\ratio_t, 4,
+			\ratio_n, 4;
 		]);
 
 		singleVoices = Dictionary.new;

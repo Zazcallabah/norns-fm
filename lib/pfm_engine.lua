@@ -2,8 +2,9 @@ local Pfm = {}
 
 local specs = {
 -- controlspec.new(min, max, warp, step, default, units, quantum, wrap)
-  ["amp"]     = controlspec.new(0.01, 10,     "exp", 0.01,      0.2, ""),
-  ["ratio"]   = controlspec.new(0, 4,     "lin", 0.1,       1, ""),
+  ["amp"]     = controlspec.new(0.01, 10, "exp", 0.01,   0.2, ""),
+  ["ratio_t"]   = controlspec.new(0, 100,  "lin", 1,       4, ""),
+  ["ratio_n"]   = controlspec.new(1, 100,  "lin", 1,       4, ""),
   ["detune"]  = controlspec.new(0.8, 1.2, "lin", 0.001,   1, ""),
   ["attack"]  = controlspec.new(0.01, 8,  "exp", 0.01,    0.1, "s"),
   ["release"] = controlspec.new(0.01, 8,  "exp", 0.01,    1, "s"),
@@ -13,7 +14,7 @@ local specs = {
 }
 
 -- this table establishes an order for parameter initialization:
-local param_names = {"amp","ratio","detune","attack","release","sustain","decay","curve"}
+local param_names = {"amp","ratio_t","ratio_n","detune","attack","release","sustain","decay","curve"}
 
 -- initialize parameters:
 function Pfm.add_params()
