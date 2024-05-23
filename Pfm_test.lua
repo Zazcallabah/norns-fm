@@ -151,6 +151,7 @@ end
 
 function redraw()
   screen.clear()
+  screen.line_width(1)
   for x = 1,4 do
     for y = 1,4 do
       if routing[y][x] then
@@ -158,19 +159,43 @@ function redraw()
       else
         screen.level(1)
       end
-      screen.circle(10+(x*5), 32+(y*5), 1)
+      screen.move((x*4), (y*4))
+      screen.line_rel(-2,0)
+      screen.line_rel(0,-2)
+      screen.line_rel(2,0)
+      screen.close()
       screen.fill()
     end
+  end
+
+  for e = 1,4 do
+    amp = params:get("Pfm_" .. e .."amp")
+    a = params:get("Pfm_" .. e .."attack")
+    s = params:get("Pfm_" .. e .."sustain")
+    d = params:get("Pfm_" .. e .."decay")
+    r = params:get("Pfm_" .. e .."release")
+    screen.level(math.floor(amp)+1)
+    screen.move(25,15*(e))
+    screen.line_rel(a,-10)
+    screen.line_rel(d,(1-s)*8)
+    screen.line_rel((20-(a+d+r)),0)
+    screen.line(45,15*(e))
+    screen.stroke()
+    t = params:get("Pfm_" .. e .."ratio_t")
+    n = params:get("Pfm_" .. e .."ratio_n")
+    screen.move(50,15*e-2)
+    screen.text( t .."/" .. n .." :: " ..string.format("%.3f", t/n))
+
   end
 
 
 	screen.level(15)
   screen.move(10,10)
-  screen.text(lastmessage)
+--  screen.text(lastmessage)
   screen.move(10,20)
-  screen.text(infomessage)
+ --screen.text(infomessage)
   screen.move(64,32)
-  screen.text(playing and "K3: turn off" or "K3: turn on")
+--  screen.text(playing and "K3: turn off" or "K3: turn on")
   screen.update()
 end
 

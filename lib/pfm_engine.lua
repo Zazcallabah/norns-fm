@@ -6,10 +6,10 @@ local specs = {
   ["ratio_t"]   = controlspec.new(0, 100,  "lin", 1,       4, ""),
   ["ratio_n"]   = controlspec.new(1, 100,  "lin", 1,       4, ""),
   ["detune"]  = controlspec.new(0.8, 1.2, "lin", 0.001,   1, ""),
-  ["attack"]  = controlspec.new(0.01, 8,  "exp", 0.01,    0.1, "s"),
-  ["release"] = controlspec.new(0.01, 8,  "exp", 0.01,    1, "s"),
+  ["attack"]  = controlspec.new(0.01, 8,  "exp", 0.05,    0.1, "s"),
+  ["release"] = controlspec.new(0.01, 8,  "exp", 0.05,    1, "s"),
   ["sustain"] = controlspec.new(0.01, 1,  "lin", 0.01,    1, ""),
-  ["decay"]   = controlspec.new(0.01, 1,  "lin", 0.01,    0.01, "s"),
+  ["decay"]   = controlspec.new(0.01, 3,  "lin", 0.05,    0.01, "s"),
   ["curve"]   = controlspec.new(-5, 5,    "lin", 0.1,     -4, ""),
 }
 
